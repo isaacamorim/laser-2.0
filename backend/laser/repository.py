@@ -270,7 +270,7 @@ def fetch_apontamentos_by_of(of_id: str) -> list[dict]:
         conn.close()
 
 
-def fetch_of_details(of_id: str, empresa: str, codseq: str) -> dict | None:
+def fetch_of_details(of_id: str, codseq: str) -> dict | None:
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -278,20 +278,16 @@ def fetch_of_details(of_id: str, empresa: str, codseq: str) -> dict | None:
         cursor.execute(
             """
             SELECT
-                l.JFL_CODMAQ,
-                l.JFL_CODSEQ,
-                r.JRF_CODCNP,
-                r.JRF_TMPMAQ,
-                r.JRF_PROHOR
-            FROM J_OFLANC l
-            LEFT JOIN J_ROTOF r
-                ON r.JRF_CODIOF = l.JFL_CODIOF
-               AND r.JRF_CODSEQ = l.JFL_CODSEQ
-            WHERE l.JFL_CODIOF = :of_id
-              AND l.JFL_EMPRESA = :empresa
-              AND l.JFL_CODSEQ = :codseq
+                JRF_CODMAQ,
+                JRF_CODSEQ,
+                JRF_CODCNP,
+                JRF_TMPMAQ,
+                JRF_PROHOR
+            FROM J_ROTOF
+            WHERE JRF_CODIOF = :of_id
+              AND JRF_CODSEQ = :codseq
             """,
-            {"of_id": of_id, "empresa": empresa, "codseq": codseq},
+            {"of_id": of_id, "codseq": codseq},
         )
 
         row = cursor.fetchone()

@@ -331,3 +331,24 @@ function _fillNewLayout(job, data) {
     document.getElementById("progressBar").style.width = pct + "%";
     document.getElementById("progressPct").textContent = pct + "%";
 }
+
+function renderOfDetails(data) {
+
+    document.getElementById("maquina").textContent = data.maquina;
+    document.getElementById("np").textContent = data.np;
+
+    const matList = document.getElementById("materiais");
+    matList.innerHTML = "";
+
+    data.materiais.forEach(m => {
+        matList.innerHTML += `
+      <div class="material-row">
+        <div>
+          <div class="mat-name">${m.descricao}</div>
+          <div class="mat-spec">${m.codigo}</div>
+        </div>
+        <div class="mat-qty">${m.estoque}</div>
+      </div>
+    `;
+    });
+}

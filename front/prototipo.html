@@ -7,217 +7,248 @@
     <title>Laser 2.0 — Estação do Operador</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
-
+        /* =====================================================================
+   BASE — espelhando seu base.css
+===================================================================== */
         :root {
-            --red: #d52029;
-            --red-dark: #a81820;
-            --red-glow: rgba(213, 32, 41, .18);
-
-            --bg: #0e0f12;
-            --surface: #16181d;
-            --surface2: #1e2028;
-            --border: rgba(255, 255, 255, .07);
-            --border2: rgba(255, 255, 255, .12);
-
-            --green: #22c55e;
-            --yellow: #eab308;
-            --blue: #3b82f6;
-
-            --text: #e8eaf0;
-            --muted: #6b7280;
-            --muted2: #9ca3af;
-
-            --r: 10px;
-            --rL: 16px;
-            --shadow: 0 2px 16px rgba(0, 0, 0, .45);
+            --primary: #d52029;
+            --primary-dark: #b11b22;
+            --bg-main: #f5f6fa;
+            --bg-card: #ffffff;
+            --text-main: #2c2c2c;
+            --text-muted: #6c757d;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, .08);
+            --shadow-md: 0 6px 20px rgba(0, 0, 0, .10);
+            --border: #e9ecef;
         }
 
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'IBM Plex Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* ─── TOPBAR ─────────────────────── */
+        /* =====================================================================
+   TOPBAR
+===================================================================== */
         .topbar {
-            background: var(--surface);
+            background: var(--bg-card);
             border-bottom: 1px solid var(--border);
-            padding: 0 24px;
-            height: 56px;
+            padding: 0 28px;
+            height: 58px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
         }
 
-        .topbar-brand {
+        .brand {
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
         .brand-icon {
-            width: 32px;
-            height: 32px;
-            background: var(--red);
-            border-radius: 8px;
+            width: 34px;
+            height: 34px;
+            background: var(--primary);
+            border-radius: 9px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: .85rem;
             color: white;
+            font-size: .9rem;
         }
 
         .brand-name {
-            font-size: .95rem;
+            font-size: 1rem;
             font-weight: 700;
-            letter-spacing: .03em;
+            color: var(--text-main);
         }
 
         .brand-sub {
-            font-size: .7rem;
-            color: var(--muted);
-            font-family: 'IBM Plex Mono', monospace;
-            letter-spacing: .05em;
+            font-size: .68rem;
+            color: var(--text-muted);
+            letter-spacing: .04em;
         }
 
         .topbar-right {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 18px;
         }
 
-        .topbar-clock {
-            font-family: 'IBM Plex Mono', monospace;
+        #clock {
             font-size: .9rem;
-            color: var(--muted2);
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
         }
 
         .operator-chip {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: var(--surface2);
-            border: 1px solid var(--border2);
-            padding: 5px 12px 5px 8px;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            padding: 5px 14px 5px 8px;
             border-radius: 20px;
             font-size: .82rem;
+            font-weight: 500;
+            color: var(--text-main);
         }
 
-        .operator-avatar {
+        .operator-chip-icon {
             width: 24px;
             height: 24px;
-            background: var(--red);
+            background: var(--primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: .65rem;
+            color: white;
+            font-size: .6rem;
         }
 
-        /* ─── LAYOUT ─────────────────────── */
+        /* =====================================================================
+   LAYOUT
+===================================================================== */
         .page {
             display: grid;
-            grid-template-columns: 1fr 320px;
-            grid-template-rows: auto auto 1fr;
-            gap: 16px;
-            padding: 20px 24px;
+            grid-template-columns: 1fr 300px;
+            grid-template-rows: auto 1fr;
+            gap: 18px;
+            padding: 22px 28px;
             max-width: 1280px;
             margin: 0 auto;
         }
 
-        /* ─── OF HEADER ──────────────────── */
+        /* =====================================================================
+   OF HEADER
+===================================================================== */
         .of-header {
-            grid-column: 1/-1;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--rL);
-            padding: 20px 24px;
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: var(--radius-lg);
+            padding: 20px 26px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 24px;
+            gap: 20px;
             flex-wrap: wrap;
+            box-shadow: 0 6px 20px rgba(213, 32, 41, .25);
             position: relative;
             overflow: hidden;
         }
 
-        .of-header::before {
+        .of-header::after {
             content: '';
             position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: var(--red);
-            border-radius: 4px 0 0 4px;
+            top: -60px;
+            right: -60px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, .06);
+            border-radius: 50%;
+            pointer-events: none;
         }
 
-        .of-tag {
+        .of-header-left {
             display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .of-tag .label {
-            font-size: .7rem;
-            color: var(--muted);
-            font-family: 'IBM Plex Mono', monospace;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-        }
-
-        .of-tag .value {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--text);
-            font-family: 'IBM Plex Mono', monospace;
-        }
-
-        .of-tags-row {
-            display: flex;
-            gap: 32px;
+            align-items: center;
+            gap: 18px;
             flex-wrap: wrap;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, .15);
+            border: 1px solid rgba(255, 255, 255, .25);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: .82rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: .15s;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, .22);
+        }
+
+        .of-grid {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+
+        .of-box span {
+            display: block;
+            font-size: .72rem;
+            opacity: .8;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .of-box strong {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .of-box.desc strong {
+            font-size: .92rem;
+            font-weight: 600;
         }
 
         .of-status {
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-shrink: 0;
         }
 
         .status-dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: var(--yellow);
-            box-shadow: 0 0 8px var(--yellow);
-            animation: pulse 2s infinite;
+            background: var(--warning);
+            box-shadow: 0 0 0 3px rgba(255, 193, 7, .3);
+            animation: blink 2s infinite;
         }
 
         .status-dot.running {
-            background: var(--green);
-            box-shadow: 0 0 8px var(--green);
+            background: #4ade80;
+            box-shadow: 0 0 0 3px rgba(74, 222, 128, .3);
         }
 
         .status-dot.stopped {
-            background: var(--muted);
+            background: rgba(255, 255, 255, .4);
             box-shadow: none;
             animation: none;
         }
 
-        @keyframes pulse {
+        @keyframes blink {
 
             0%,
             100% {
@@ -225,33 +256,28 @@
             }
 
             50% {
-                opacity: .4
+                opacity: .35
             }
         }
 
-        .status-text {
-            font-size: .85rem;
+        #statusText {
+            font-size: .88rem;
             font-weight: 600;
-            color: var(--muted2);
+            opacity: .95;
         }
 
-        /* ─── MAIN PANEL ─────────────────── */
-        .main-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        /* ─── CARD ───────────────────────── */
+        /* =====================================================================
+   CARD GENÉRICO
+===================================================================== */
         .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--rL);
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             overflow: hidden;
         }
 
         .card-header {
-            padding: 14px 18px;
+            padding: 13px 18px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -260,25 +286,112 @@
 
         .card-title {
             font-size: .82rem;
-            font-weight: 600;
-            letter-spacing: .06em;
+            font-weight: 700;
             text-transform: uppercase;
-            color: var(--muted2);
+            letter-spacing: .06em;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
         }
 
         .card-title i {
-            color: var(--red);
-            font-size: .9rem;
+            color: var(--primary);
         }
 
         .card-body {
             padding: 18px;
         }
 
-        /* ─── MATERIAIS ──────────────────── */
+        /* =====================================================================
+   MAIN PANEL
+===================================================================== */
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ── Descrição rápida ── */
+        .desc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .desc-item {
+            background: var(--bg-main);
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .desc-item .lbl {
+            font-size: .72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: 3px;
+        }
+
+        .desc-item .val {
+            font-size: .92rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* ── Desenho ── */
+        .drawing-box {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            aspect-ratio: 16/8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #drawingImg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #drawingEmpty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: .85rem;
+        }
+
+        #drawingEmpty i {
+            font-size: 2rem;
+            opacity: .35;
+        }
+
+        .drawing-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, .85);
+            border: 1px solid var(--border);
+            font-size: .68rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--text-muted);
+        }
+
+        .drawing-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        /* ── Materiais ── */
         .material-row {
             display: flex;
             align-items: center;
@@ -287,92 +400,323 @@
             border-bottom: 1px solid var(--border);
         }
 
+        .material-row:first-child {
+            padding-top: 0;
+        }
+
         .material-row:last-child {
             border-bottom: none;
             padding-bottom: 0;
         }
 
-        .material-row:first-child {
-            padding-top: 0;
-        }
-
         .mat-name {
             font-size: .9rem;
-            font-weight: 500;
-            color: var(--text);
+            font-weight: 600;
+            color: var(--text-main);
         }
 
         .mat-spec {
-            font-size: .78rem;
-            color: var(--muted);
+            font-size: .76rem;
+            color: var(--text-muted);
             margin-top: 2px;
         }
 
         .mat-qty {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: .82rem;
-            background: var(--surface2);
-            border: 1px solid var(--border2);
+            font-size: .8rem;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
             padding: 3px 10px;
             border-radius: 6px;
-            color: var(--muted2);
+            color: var(--text-muted);
             white-space: nowrap;
         }
 
-        /* ─── DESENHO ────────────────────── */
-        .desenho-wrap {
-            background: var(--surface2);
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            aspect-ratio: 16/9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .desenho-mock {
+        /* ── Tabela de apontamentos ── */
+        .apt-table {
             width: 100%;
-            height: 100%;
+            border-collapse: collapse;
+            font-size: .82rem;
+        }
+
+        .apt-table th {
+            padding: 10px 12px;
+            text-align: left;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            border-bottom: 2px solid var(--border);
+            background: var(--bg-main);
+        }
+
+        .apt-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .apt-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .apt-table tr:hover td {
+            background: #fafafa;
+        }
+
+        .apt-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-size: .73rem;
+            font-weight: 600;
+        }
+
+        .apt-badge.done {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .apt-badge.running {
+            background: #fff8e1;
+            color: #f57c00;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 16px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+            color: #ccc;
+        }
+
+        .empty-state p {
+            font-size: .82rem;
+            line-height: 1.5;
+        }
+
+        /* =====================================================================
+   SIDEBAR
+===================================================================== */
+        .sidebar {
             display: flex;
             flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ── POP ── */
+        .pop-desc {
+            font-size: .82rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .pop-filename {
+            text-align: center;
+            font-size: .72rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        /* ── Timer ── */
+        .timer-display {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            text-align: center;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        #timer {
+            font-size: 2.2rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-main);
+            line-height: 1;
+            letter-spacing: .03em;
+        }
+
+        .timer-lbl {
+            font-size: .7rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+        }
+
+        /* ── Progresso ── */
+        .progress-section {
+            margin-bottom: 14px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: .78rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .progress-bar-bg {
+            background: var(--border);
+            border-radius: 100px;
+            height: 7px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #f87171);
+            border-radius: 100px;
+            width: 0%;
+            transition: width .4s ease;
+        }
+
+        .qty-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .qty-box {
+            flex: 1;
+            text-align: center;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            padding: 8px 6px;
+            border-radius: 8px;
+        }
+
+        .qty-num {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1;
+        }
+
+        .qty-num.green {
+            color: var(--success);
+        }
+
+        .qty-num.blue {
+            color: #1976d2;
+        }
+
+        .qty-lbl {
+            font-size: .65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-top: 2px;
+        }
+
+        /* ── Controles ── */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* ── BOTÕES ── */
+        .btn {
+            width: 100%;
+            padding: 13px 16px;
+            border-radius: var(--radius);
+            border: none;
+            font-weight: 600;
+            font-size: .88rem;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            cursor: pointer;
+            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            color: var(--muted);
+            gap: 8px;
+            transition: .15s;
         }
 
-        .desenho-mock svg {
-            width: 72px;
-            opacity: .3;
+        .btn:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
-        .desenho-badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(0, 0, 0, .6);
-            border: 1px solid var(--border2);
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: .7rem;
-            padding: 3px 8px;
-            border-radius: 4px;
-            color: var(--muted2);
+        .btn-primary {
+            background: var(--primary);
+            color: white;
         }
 
-        /* ─── TIMELINE / LOG ─────────────── */
-        .log-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: #333;
+        }
+
+        .btn-warning:hover:not(:disabled) {
+            background: #e0a800;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: var(--bg-main);
+        }
+
+        .ctrl-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 2px 0;
+        }
+
+        /* ── Log ── */
+        #logBox {
+            max-height: 180px;
+            overflow-y: auto;
         }
 
         .log-item {
             display: flex;
-            gap: 12px;
-            padding: 10px 0;
+            gap: 10px;
+            padding: 8px 0;
             border-bottom: 1px solid var(--border);
-            font-size: .82rem;
+            font-size: .8rem;
         }
 
         .log-item:last-child {
@@ -385,356 +729,319 @@
         }
 
         .log-time {
-            font-family: 'IBM Plex Mono', monospace;
-            color: var(--muted);
+            color: var(--text-muted);
             white-space: nowrap;
             flex-shrink: 0;
+            font-size: .75rem;
         }
 
         .log-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             margin-top: 3px;
             flex-shrink: 0;
         }
 
         .log-msg {
-            color: var(--muted2);
+            color: var(--text-main);
             line-height: 1.4;
         }
 
-        /* ─── SIDEBAR ────────────────────── */
-        .sidebar {
+        /* =====================================================================
+   MODAL DE QUANTIDADE — mesmo do seu apontamento.css
+===================================================================== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .6);
+            backdrop-filter: blur(4px);
             display: flex;
-            flex-direction: column;
-            gap: 16px;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all .3s ease;
         }
 
-        /* ─── CONTROLE ───────────────────── */
-        .control-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--rL);
-            overflow: hidden;
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
 
-        .control-body {
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .modal {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
+            max-width: 450px;
+            width: 90%;
+            transform: scale(.8) translateY(30px);
+            transition: all .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
         }
 
-        .btn {
-            width: 100%;
-            padding: 13px 16px;
-            border: none;
-            border-radius: var(--r);
-            font-size: .88rem;
-            font-weight: 600;
-            font-family: 'IBM Plex Sans', sans-serif;
-            cursor: pointer;
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .modal-icon {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            transition: all .15s;
-            letter-spacing: .02em;
+            font-size: 1.4rem;
         }
 
-        .btn:disabled {
-            opacity: .35;
-            cursor: not-allowed;
-        }
-
-        .btn-start {
-            background: var(--green);
-            color: #fff;
-        }
-
-        .btn-start:hover:not(:disabled) {
-            background: #16a34a;
-            transform: translateY(-1px);
-        }
-
-        .btn-pause {
-            background: var(--surface2);
-            color: var(--yellow);
-            border: 1px solid rgba(234, 179, 8, .25);
-        }
-
-        .btn-pause:hover:not(:disabled) {
-            background: rgba(234, 179, 8, .1);
-        }
-
-        .btn-stop {
-            background: var(--surface2);
-            color: #f87171;
-            border: 1px solid rgba(248, 113, 113, .25);
-        }
-
-        .btn-stop:hover:not(:disabled) {
-            background: rgba(248, 113, 113, .1);
-        }
-
-        .btn-pop {
-            background: var(--red);
-            color: #fff;
-        }
-
-        .btn-pop:hover {
-            background: var(--red-dark);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 16px var(--red-glow);
-        }
-
-        .control-divider {
-            height: 1px;
-            background: var(--border);
-            margin: 2px 0;
-        }
-
-        /* ─── TIMER ──────────────────────── */
-        .timer-display {
-            text-align: center;
-            padding: 16px;
-            background: var(--surface2);
-            border-radius: var(--r);
-        }
-
-        .timer-value {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 2.2rem;
-            font-weight: 600;
-            color: var(--text);
-            letter-spacing: .04em;
-            line-height: 1;
-        }
-
-        .timer-label {
-            font-size: .72rem;
-            color: var(--muted);
-            margin-top: 4px;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-        }
-
-        /* ─── PROGRESS ───────────────────── */
-        .progress-wrap {
-            padding: 16px 18px;
-            border-top: 1px solid var(--border);
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: .78rem;
-            color: var(--muted);
+        .modal-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-main);
             margin-bottom: 8px;
         }
 
-        .progress-bar-bg {
-            background: var(--surface2);
-            border-radius: 100px;
-            height: 6px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--red), #ff6b6b);
-            border-radius: 100px;
-            width: 0%;
-            transition: width .4s ease;
-        }
-
-        .progress-qty {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: .82rem;
-        }
-
-        .qty-box {
-            text-align: center;
-            background: var(--surface2);
-            padding: 8px 12px;
-            border-radius: 8px;
-            flex: 1;
-            margin: 0 3px;
-        }
-
-        .qty-box:first-child {
-            margin-left: 0
-        }
-
-        .qty-box:last-child {
-            margin-right: 0
-        }
-
-        .qty-num {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .qty-num.green {
-            color: var(--green)
-        }
-
-        .qty-num.blue {
-            color: var(--blue)
-        }
-
-        .qty-lbl {
-            font-size: .68rem;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: .06em;
-            margin-top: 2px;
-        }
-
-        /* ─── APONTAMENTOS TABLE ─────────── */
-        .apt-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: .8rem;
-        }
-
-        .apt-table th {
-            padding: 8px 10px;
-            text-align: left;
-            color: var(--muted);
-            font-weight: 600;
-            font-size: .72rem;
-            text-transform: uppercase;
-            letter-spacing: .06em;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .apt-table td {
-            padding: 9px 10px;
-            border-bottom: 1px solid var(--border);
-            color: var(--muted2);
-        }
-
-        .apt-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .apt-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: .72rem;
-            font-weight: 600;
-        }
-
-        .apt-badge.done {
-            background: rgba(34, 197, 94, .12);
-            color: #4ade80
-        }
-
-        .apt-badge.running {
-            background: rgba(59, 130, 246, .12);
-            color: #60a5fa
-        }
-
-        .apt-badge.paused {
-            background: rgba(234, 179, 8, .12);
-            color: #fbbf24
-        }
-
-        /* ─── EMPTY ──────────────────────── */
-        .empty-state {
-            text-align: center;
-            padding: 32px 16px;
-            color: var(--muted);
-        }
-
-        .empty-state i {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            display: block;
-            opacity: .3;
-        }
-
-        .empty-state p {
-            font-size: .82rem;
+        .modal-subtitle {
+            font-size: .88rem;
+            color: var(--text-muted);
             line-height: 1.5;
         }
 
-        /* ─── SCROLLBAR ──────────────────── */
+        .input-group {
+            margin-bottom: 28px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: .9rem;
+            color: var(--text-main);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 13px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: .2s;
+            background: var(--bg-main);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(213, 32, 41, .12);
+        }
+
+        .input-field.error {
+            border-color: var(--danger);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: .78rem;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity .2s;
+        }
+
+        .error-message.show {
+            opacity: 1;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 11px 22px;
+            border: none;
+            border-radius: 10px;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .2s;
+            min-width: 90px;
+        }
+
+        .btn-cancel {
+            background: var(--bg-main);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .btn-cancel:hover {
+            background: var(--border);
+        }
+
+        .btn-confirm {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-confirm:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color .2s;
+        }
+
+        .close-btn:hover {
+            color: var(--text-main);
+        }
+
+        /* =====================================================================
+   TOAST
+===================================================================== */
+        .toast-container {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            padding: 12px 18px;
+            border-radius: var(--radius);
+            font-size: .85rem;
+            font-weight: 500;
+            color: white;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .15);
+            animation: slideIn .25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.success {
+            background: var(--success);
+        }
+
+        .toast.error {
+            background: var(--danger);
+        }
+
+        .toast.info {
+            background: #1976d2;
+        }
+
+        .toast.warning {
+            background: var(--warning);
+            color: #333;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(60px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* =====================================================================
+   SCROLLBAR
+===================================================================== */
         ::-webkit-scrollbar {
-            width: 5px
+            width: 5px;
         }
 
         ::-webkit-scrollbar-track {
-            background: transparent
+            background: transparent;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--surface2);
-            border-radius: 10px
+            background: var(--border);
+            border-radius: 10px;
         }
 
-        /* ─── BACK BTN ───────────────────── */
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: .8rem;
-            color: var(--muted);
-            text-decoration: none;
-            padding: 5px 0;
-            transition: .15s;
-        }
-
-        .back-link:hover {
-            color: var(--text)
-        }
-
-        /* ─── ANIMATIONS ─────────────────── */
-        @keyframes fadeIn {
+        /* =====================================================================
+   ANIMAÇÕES DE ENTRADA
+===================================================================== */
+        @keyframes fadeUp {
             from {
                 opacity: 0;
-                transform: translateY(8px)
+                transform: translateY(10px);
             }
 
             to {
                 opacity: 1;
-                transform: translateY(0)
+                transform: translateY(0);
             }
         }
 
         .card,
-        .of-header,
-        .control-card {
-            animation: fadeIn .35s ease both;
+        .of-header {
+            animation: fadeUp .3s ease both;
         }
 
-        .page>*:nth-child(2) {
-            animation-delay: .05s
+        .main-panel .card:nth-child(2) {
+            animation-delay: .05s;
         }
 
-        .page>*:nth-child(3) {
-            animation-delay: .1s
+        .main-panel .card:nth-child(3) {
+            animation-delay: .1s;
         }
 
-        .page>*:nth-child(4) {
-            animation-delay: .15s
+        .main-panel .card:nth-child(4) {
+            animation-delay: .15s;
+        }
+
+        .sidebar .card:nth-child(2) {
+            animation-delay: .08s;
+        }
+
+        .sidebar .card:nth-child(3) {
+            animation-delay: .13s;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- ════════ TOPBAR ════════ -->
-    <div class="topbar">
-        <div class="topbar-brand">
+    <!-- ════════════════════════ TOPBAR ════════════════════════ -->
+    <header class="topbar">
+        <div class="brand">
             <div class="brand-icon"><i class="fas fa-crosshairs"></i></div>
             <div>
                 <div class="brand-name">Apontamento Laser</div>
@@ -742,66 +1049,75 @@
             </div>
         </div>
         <div class="topbar-right">
-            <div class="topbar-clock" id="clock">00:00:00</div>
+            <span id="clock">00:00:00</span>
             <div class="operator-chip">
-                <div class="operator-avatar"><i class="fas fa-user" style="font-size:.55rem"></i></div>
-                <span>OP 0011 — CASSIO D.</span>
+                <div class="operator-chip-icon"><i class="fas fa-user"></i></div>
+                <span id="operatorLabel">OP 0011 — CASSIO D.</span>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- ════════ PAGE ════════ -->
-    <div class="page">
+    <!-- ════════════════════════ PAGE ════════════════════════ -->
+    <main class="page">
 
         <!-- ─── OF HEADER ─── -->
-        <div class="of-header">
-            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-                <a href="#" class="back-link"><i class="fas fa-chevron-left"></i> Sequenciamento</a>
-                <div style="width:1px;height:24px;background:var(--border)"></div>
-                <div class="of-tags-row">
-                    <div class="of-tag">
-                        <span class="label">OF</span>
-                        <span class="value">58444</span>
+        <section class="of-header">
+            <div class="of-header-left">
+                <a class="back-btn" id="btnBack" href="#">
+                    <i class="fas fa-chevron-left"></i> Sequenciamento
+                </a>
+                <div class="of-grid">
+                    <div class="of-box">
+                        <span>OF</span>
+                        <strong id="ofValue">58444</strong>
                     </div>
-                    <div class="of-tag">
-                        <span class="label">Operação</span>
-                        <span class="value">OP-39</span>
+                    <div class="of-box">
+                        <span>Operação</span>
+                        <strong id="opValue">OP-39</strong>
                     </div>
-                    <div class="of-tag">
-                        <span class="label">Máquina</span>
-                        <span class="value">LASER-01</span>
+                    <div class="of-box">
+                        <span>Máquina</span>
+                        <strong id="maqValue">LASER-01</strong>
                     </div>
-                    <div class="of-tag">
-                        <span class="label">Tarefa</span>
-                        <span class="value" style="font-family:'IBM Plex Sans',sans-serif;font-size:.95rem">Corte de
-                            Chapa</span>
+                    <div class="of-box">
+                        <span>Produto</span>
+                        <strong id="prodValue">P003107</strong>
                     </div>
-                    <div class="of-tag">
-                        <span class="label">Produto</span>
-                        <span class="value"
-                            style="font-family:'IBM Plex Sans',sans-serif;font-size:.95rem">P003107</span>
+                    <div class="of-box desc">
+                        <span>Descrição</span>
+                        <strong id="descValue">FERRO CHATO BASE DO MANCAL DO CORPO</strong>
                     </div>
                 </div>
             </div>
             <div class="of-status">
                 <div class="status-dot" id="statusDot"></div>
-                <span class="status-text" id="statusText">Pronto para iniciar</span>
+                <span id="statusText">Pronto para iniciar</span>
             </div>
-        </div>
+        </section>
 
-        <!-- ─── MAIN PANEL ─── -->
+        <!-- ═════════════════════ MAIN PANEL ═════════════════════ -->
         <div class="main-panel">
 
-            <!-- Descrição -->
+            <!-- Detalhes rápidos -->
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title"><i class="fas fa-tag"></i> Descrição da Peça</span>
+                    <span class="card-title"><i class="fas fa-info-circle"></i> Informações Adicionais</span>
                 </div>
                 <div class="card-body">
-                    <div style="font-size:1.05rem;font-weight:600;margin-bottom:4px">FERRO CHATO BASE DO MANCAL DO CORPO
+                    <div class="desc-grid">
+                        <div class="desc-item">
+                            <div class="lbl">Empresa</div>
+                            <div class="val" id="empresaVal">1 — SP/MG</div>
+                        </div>
+                        <div class="desc-item">
+                            <div class="lbl">NP</div>
+                            <div class="val" id="npVal">NP-554</div>
+                        </div>
+                        <div class="desc-item">
+                            <div class="lbl">Sequência</div>
+                            <div class="val" id="seqVal">39</div>
+                        </div>
                     </div>
-                    <div style="font-size:.85rem;color:var(--muted)">Destino: SP/MG &nbsp;·&nbsp; Sequência: 39
-                        &nbsp;·&nbsp; Empresa: 1</div>
                 </div>
             </div>
 
@@ -809,39 +1125,47 @@
             <div class="card">
                 <div class="card-header">
                     <span class="card-title"><i class="fas fa-drafting-compass"></i> Desenho da Peça</span>
-                    <div class="apt-badge done" style="font-size:.7rem">P003107.STEP</div>
+                    <span style="font-size:.75rem;color:var(--text-muted);background:var(--bg-main);
+               padding:3px 10px;border-radius:6px;border:1px solid var(--border)">
+                        P003107.STEP
+                    </span>
                 </div>
                 <div class="card-body" style="padding:12px">
-                    <div class="desenho-wrap">
-                        <div class="desenho-mock">
-                            <!-- SVG placeholder de peça -->
-                            <svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="20" y="40" width="160" height="40" rx="4" stroke="#e8eaf0" stroke-width="2" />
-                                <rect x="40" y="30" width="30" height="20" rx="2" stroke="#e8eaf0" stroke-width="1.5" />
-                                <rect x="130" y="30" width="30" height="20" rx="2" stroke="#e8eaf0"
+                    <div class="drawing-box">
+                        <img id="drawingImg" src="" alt="Desenho" style="display:none">
+                        <div id="drawingEmpty">
+                            <i class="fas fa-drafting-compass"></i>
+                            <!-- SVG representativo da peça -->
+                            <svg width="260" height="110" viewBox="0 0 260 110" fill="none"
+                                xmlns="http://www.w3.org/2000/svg" style="margin:4px 0">
+                                <rect x="20" y="38" width="220" height="34" rx="3" stroke="#adb5bd"
                                     stroke-width="1.5" />
-                                <circle cx="55" cy="60" r="6" stroke="#e8eaf0" stroke-width="1.5" />
-                                <circle cx="145" cy="60" r="6" stroke="#e8eaf0" stroke-width="1.5" />
-                                <line x1="20" y1="90" x2="180" y2="90" stroke="#e8eaf0" stroke-width="1"
+                                <rect x="42" y="26" width="36" height="22" rx="2" stroke="#adb5bd" stroke-width="1.2" />
+                                <rect x="182" y="26" width="36" height="22" rx="2" stroke="#adb5bd"
+                                    stroke-width="1.2" />
+                                <circle cx="60" cy="55" r="7" stroke="#adb5bd" stroke-width="1.2" />
+                                <circle cx="200" cy="55" r="7" stroke="#adb5bd" stroke-width="1.2" />
+                                <line x1="20" y1="82" x2="240" y2="82" stroke="#dee2e6" stroke-width=".8"
                                     stroke-dasharray="4 3" />
-                                <line x1="100" y1="40" x2="100" y2="80" stroke="#d52029" stroke-width="1"
+                                <line x1="130" y1="38" x2="130" y2="72" stroke="#d52029" stroke-width="1"
                                     stroke-dasharray="3 2" />
-                                <!-- cotagem -->
-                                <line x1="20" y1="100" x2="180" y2="100" stroke="#6b7280" stroke-width="1" />
-                                <line x1="20" y1="96" x2="20" y2="104" stroke="#6b7280" stroke-width="1" />
-                                <line x1="180" y1="96" x2="180" y2="104" stroke="#6b7280" stroke-width="1" />
+                                <line x1="20" y1="94" x2="240" y2="94" stroke="#ced4da" stroke-width=".8" />
+                                <line x1="20" y1="90" x2="20" y2="98" stroke="#ced4da" stroke-width=".8" />
+                                <line x1="240" y1="90" x2="240" y2="98" stroke="#ced4da" stroke-width=".8" />
+                                <text x="125" y="102" font-size="9" fill="#adb5bd" font-family="Segoe UI">830mm</text>
                             </svg>
-                            <div style="font-size:.78rem">Arquivo .STEP disponível para download</div>
+                            <span style="font-size:.78rem;color:var(--text-muted)">Arquivo disponível para
+                                download</span>
                         </div>
-                        <div class="desenho-badge">PREVIEW</div>
+                        <div class="drawing-badge">PREVIEW</div>
                     </div>
-                    <div style="margin-top:10px;display:flex;gap:8px">
-                        <button class="btn btn-pop" style="flex:1;padding:10px">
+                    <div class="drawing-actions">
+                        <button class="btn btn-primary" id="btnDownloadStep"
+                            style="flex:1;padding:10px;font-size:.85rem">
                             <i class="fas fa-download"></i> Baixar .STEP
                         </button>
-                        <button class="btn"
-                            style="flex:1;padding:10px;background:var(--surface2);color:var(--muted2);border:1px solid var(--border2)">
-                            <i class="fas fa-expand-alt"></i> Ampliar
+                        <button class="btn btn-outline" style="flex:0 0 auto;padding:10px 14px;width:auto">
+                            <i class="fas fa-expand-alt"></i>
                         </button>
                     </div>
                 </div>
@@ -851,36 +1175,38 @@
             <div class="card">
                 <div class="card-header">
                     <span class="card-title"><i class="fas fa-boxes"></i> Materiais da OF</span>
-                    <span style="font-size:.75rem;color:var(--muted)">4 itens</span>
+                    <span style="font-size:.75rem;color:var(--text-muted)">4 itens</span>
                 </div>
-                <div class="card-body" style="padding:14px 18px">
-                    <div class="material-row">
-                        <div>
-                            <div class="mat-name">Ferro Chato A36</div>
-                            <div class="mat-spec">Bitola 3/16" · Comprimento variável</div>
+                <div class="card-body" style="padding:12px 18px">
+                    <div id="materialsBox">
+                        <div class="material-row">
+                            <div>
+                                <div class="mat-name">Ferro Chato A36</div>
+                                <div class="mat-spec">Bitola 3/16" · Comprimento variável</div>
+                            </div>
+                            <div class="mat-qty">Qtd: 30</div>
                         </div>
-                        <div class="mat-qty">Qtd: 30</div>
-                    </div>
-                    <div class="material-row">
-                        <div>
-                            <div class="mat-name">Gás Nitrogênio</div>
-                            <div class="mat-spec">Alta pureza · Cilindro 50L</div>
+                        <div class="material-row">
+                            <div>
+                                <div class="mat-name">Gás Nitrogênio</div>
+                                <div class="mat-spec">Alta pureza · Cilindro 50L</div>
+                            </div>
+                            <div class="mat-qty">1 cil.</div>
                         </div>
-                        <div class="mat-qty">1 cil.</div>
-                    </div>
-                    <div class="material-row">
-                        <div>
-                            <div class="mat-name">Insumo Lubrificante</div>
-                            <div class="mat-spec">EP-220 · Aplicação em cabeçote</div>
+                        <div class="material-row">
+                            <div>
+                                <div class="mat-name">Insumo Lubrificante</div>
+                                <div class="mat-spec">EP-220 · Aplicação em cabeçote</div>
+                            </div>
+                            <div class="mat-qty">Qtd: 1</div>
                         </div>
-                        <div class="mat-qty">Qtd: 1</div>
-                    </div>
-                    <div class="material-row">
-                        <div>
-                            <div class="mat-name">Bico de Corte</div>
-                            <div class="mat-spec">Ø1.5mm · Série Standard</div>
+                        <div class="material-row">
+                            <div>
+                                <div class="mat-name">Bico de Corte</div>
+                                <div class="mat-spec">Ø1.5mm · Série Standard</div>
+                            </div>
+                            <div class="mat-qty">Qtd: 1</div>
                         </div>
-                        <div class="mat-qty">Qtd: 1</div>
                     </div>
                 </div>
             </div>
@@ -891,106 +1217,105 @@
                     <span class="card-title"><i class="fas fa-history"></i> Apontamentos desta OF</span>
                 </div>
                 <div class="card-body" style="padding:0">
-                    <div class="empty-state">
+
+                    <table class="apt-table" id="aptTable" style="display:none">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Operador</th>
+                                <th>Início</th>
+                                <th>Fim</th>
+                                <th>Qtd</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="existingApontamentosBody"></tbody>
+                    </table>
+
+                    <div id="noExistingApontamentos" class="empty-state">
                         <i class="fas fa-clipboard-list"></i>
-                        <p>Nenhum apontamento realizado ainda.<br>Inicie o apontamento para registrar a produção.</p>
+                        <p>Nenhum apontamento realizado ainda.<br>Inicie para registrar a produção.</p>
                     </div>
-                    <!--
-        Quando tiver dados:
-        <table class="apt-table">
-          <thead>
-            <tr>
-              <th>#</th><th>Operador</th><th>Início</th><th>Fim</th><th>Qtd</th><th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>001</td>
-              <td>CASSIO D.</td>
-              <td>08:12:04</td>
-              <td>10:55:21</td>
-              <td>15</td>
-              <td><span class="apt-badge done">✓ Concluído</span></td>
-            </tr>
-          </tbody>
-        </table>
-        -->
+
                 </div>
             </div>
 
-        </div>
+            <!-- Voltar -->
+            <button class="btn btn-outline" id="finishApontamentoBtn">
+                <i class="fas fa-arrow-left"></i> Voltar para Sequenciamento
+            </button>
 
-        <!-- ─── SIDEBAR ─── -->
-        <div class="sidebar">
+        </div><!-- /main-panel -->
+
+        <!-- ═════════════════════ SIDEBAR ═════════════════════ -->
+        <aside class="sidebar">
 
             <!-- POP -->
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title"><i class="fas fa-file-alt"></i> Procedimento (POP)</span>
+                    <span class="card-title"><i class="fas fa-file-alt"></i> POP</span>
                 </div>
                 <div class="card-body">
-                    <div style="font-size:.82rem;color:var(--muted);margin-bottom:12px;line-height:1.5">
-                        Consulte o procedimento padrão antes de iniciar o processo de corte.
-                    </div>
-                    <button class="btn btn-pop" onclick="alert('Abrindo POP_LASER_CORTE.pdf...')">
+                    <p class="pop-desc">Consulte o procedimento padrão antes de iniciar o corte.</p>
+                    <button class="btn btn-primary" id="btnPop">
                         <i class="fas fa-external-link-alt"></i> Abrir POP da Operação
                     </button>
-                    <div style="margin-top:8px;font-size:.72rem;color:var(--muted);text-align:center">
-                        POP_LASER_CORTE_v3.pdf
-                    </div>
+                    <div class="pop-filename" id="popName">POP_LASER_CORTE_v3.pdf</div>
                 </div>
             </div>
 
             <!-- Controle -->
-            <div class="control-card">
+            <div class="card">
                 <div class="card-header">
                     <span class="card-title"><i class="fas fa-sliders-h"></i> Controle de Produção</span>
                 </div>
+                <div class="card-body">
 
-                <!-- Timer -->
-                <div style="padding:16px 18px;border-bottom:1px solid var(--border)">
+                    <!-- Timer -->
                     <div class="timer-display">
-                        <div class="timer-value" id="timer">00:00:00</div>
-                        <div class="timer-label">Tempo de apontamento</div>
+                        <div id="timer">00:00:00</div>
+                        <div class="timer-lbl">Tempo de apontamento</div>
                     </div>
-                </div>
 
-                <!-- Qtd -->
-                <div class="progress-wrap">
-                    <div class="progress-header">
-                        <span>Progresso da OF</span>
-                        <span id="progressPct">0%</span>
-                    </div>
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" id="progressBar"></div>
-                    </div>
-                    <div class="progress-qty">
-                        <div class="qty-box">
-                            <div class="qty-num green" id="qtdRealizada">0</div>
-                            <div class="qty-lbl">Realizado</div>
+                    <!-- Progresso -->
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span>Progresso da OF</span>
+                            <span id="progressPct">0%</span>
                         </div>
-                        <div class="qty-box">
-                            <div class="qty-num blue">30</div>
-                            <div class="qty-lbl">Programado</div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="progressBar"></div>
                         </div>
-                        <div class="qty-box">
-                            <div class="qty-num" id="qtdRestante" style="color:var(--muted2)">30</div>
-                            <div class="qty-lbl">Restante</div>
+                        <div class="qty-row">
+                            <div class="qty-box">
+                                <div class="qty-num green" id="qtdReal">0</div>
+                                <div class="qty-lbl">Real</div>
+                            </div>
+                            <div class="qty-box">
+                                <div class="qty-num blue" id="qtdProg">30</div>
+                                <div class="qty-lbl">Prog</div>
+                            </div>
+                            <div class="qty-box">
+                                <div class="qty-num" id="qtdRestante">30</div>
+                                <div class="qty-lbl">Rest</div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="control-body">
-                    <button class="btn btn-start" id="btnStart" onclick="startApontamento()">
-                        <i class="fas fa-play"></i> Iniciar Apontamento
-                    </button>
-                    <button class="btn btn-pause" id="btnPause" disabled onclick="pauseApontamento()">
-                        <i class="fas fa-pause"></i> Pausar
-                    </button>
-                    <div class="control-divider"></div>
-                    <button class="btn btn-stop" id="btnStop" disabled onclick="finishApontamento()">
-                        <i class="fas fa-stop"></i> Finalizar Apontamento
-                    </button>
+                    <!-- Botões -->
+                    <div class="controls">
+                        <button class="btn btn-success" id="startApontamentoBtn">
+                            <i class="fas fa-play"></i> Iniciar Apontamento
+                        </button>
+                        <button class="btn btn-warning" id="pauseApontamentoBtn" disabled>
+                            <i class="fas fa-pause"></i> Pausar Apontamento
+                        </button>
+                        <div class="ctrl-divider"></div>
+                        <button class="btn btn-danger" id="manualFinishApontamentoBtn" disabled>
+                            <i class="fas fa-stop"></i> Finalizar Apontamento
+                        </button>
+                    </div>
+
                 </div>
             </div>
 
@@ -999,134 +1324,222 @@
                 <div class="card-header">
                     <span class="card-title"><i class="fas fa-terminal"></i> Log de Atividade</span>
                 </div>
-                <div class="card-body" style="padding:14px 18px">
-                    <div class="log-list" id="logList">
+                <div class="card-body" style="padding:12px 16px">
+                    <div id="logBox">
                         <div class="log-item">
-                            <span class="log-time" id="logInitTime">--:--</span>
-                            <div class="log-dot" style="background:var(--blue)"></div>
+                            <span class="log-time">--:--</span>
+                            <div class="log-dot" style="background:#1976d2"></div>
                             <span class="log-msg">OF carregada e pronta para apontamento</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-        </div>
+        </aside>
 
+    </main>
+
+    <!-- ════════════════════════ MODAL QTD ════════════════════════ -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <button class="close-btn" id="modalCloseBtn">&times;</button>
+            <div class="modal-header">
+                <div class="modal-icon">📈</div>
+                <h2 class="modal-title">Quantidade Realizada</h2>
+                <p class="modal-subtitle">Informe a quantidade total realizada para este apontamento</p>
+            </div>
+            <div class="input-group">
+                <label class="input-label" for="quantityInput">Quantidade *</label>
+                <input type="number" id="quantityInput" class="input-field" placeholder="Ex: 15" min="0">
+                <div id="errorMessage" class="error-message">Por favor, informe uma quantidade válida</div>
+            </div>
+            <div class="button-group">
+                <button class="modal-btn btn-cancel" id="modalCancelBtn">Cancelar</button>
+                <button class="modal-btn btn-confirm" id="modalConfirmBtn">Confirmar</button>
+            </div>
+        </div>
     </div>
 
+    <!-- Toast -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- ════════════════════════ SCRIPTS ════════════════════════ -->
     <script>
-        // ─── CLOCK ───────────────────────────────
-        function updateClock() {
-            const n = new Date();
+        /* ────────────────────────────────────────────
+           CLOCK
+        ──────────────────────────────────────────── */
+        (function tick() {
             document.getElementById('clock').textContent =
-                n.toLocaleTimeString('pt-BR');
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+                new Date().toLocaleTimeString('pt-BR');
+            setTimeout(tick, 1000);
+        })();
 
-        // ─── TIMER ───────────────────────────────
-        let timerInterval = null;
-        let elapsed = 0;
-        let running = false;
-        let paused = false;
+        /* ────────────────────────────────────────────
+           TIMER
+        ──────────────────────────────────────────── */
+        let elapsed = 0, timerInt = null, running = false, wasPaused = false;
 
-        function formatTime(s) {
-            const h = String(Math.floor(s / 3600)).padStart(2, '0');
-            const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
-            const sec = String(s % 60).padStart(2, '0');
-            return `${h}:${m}:${sec}`;
+        function fmtTime(s) {
+            return [Math.floor(s / 3600), Math.floor((s % 3600) / 60), s % 60]
+                .map(n => String(n).padStart(2, '0')).join(':');
         }
 
-        function startApontamento() {
-            if (paused) {
-                // Retomar
-                running = true;
-                paused = false;
-                timerInterval = setInterval(() => { elapsed++; document.getElementById('timer').textContent = formatTime(elapsed); }, 1000);
-                document.getElementById('btnStart').disabled = true;
-                document.getElementById('btnPause').disabled = false;
-                document.getElementById('btnStop').disabled = false;
-                document.getElementById('statusDot').className = 'status-dot running';
-                document.getElementById('statusText').textContent = 'Apontamento em andamento';
-                addLog('Apontamento retomado', 'var(--green)');
+        /* ────────────────────────────────────────────
+           CONTROLE — lógica de demonstração
+           (substitua pelos handlers reais do apontamento.js)
+        ──────────────────────────────────────────── */
+        document.getElementById('startApontamentoBtn').onclick = function () {
+            running = true;
+
+            if (wasPaused) {
+                addLog('Apontamento retomado', '#28a745');
+                wasPaused = false;
+            } else {
+                addLog('Apontamento iniciado', '#28a745');
+                elapsed = 0;
+            }
+
+            timerInt = setInterval(() => { elapsed++; document.getElementById('timer').textContent = fmtTime(elapsed); }, 1000);
+
+            this.disabled = true;
+            document.getElementById('pauseApontamentoBtn').disabled = false;
+            document.getElementById('manualFinishApontamentoBtn').disabled = false;
+            setStatus('running', 'Em andamento');
+        };
+
+        document.getElementById('pauseApontamentoBtn').onclick = function () {
+            clearInterval(timerInt);
+            running = false; wasPaused = true;
+
+            this.disabled = true;
+            const sb = document.getElementById('startApontamentoBtn');
+            sb.disabled = false;
+            sb.innerHTML = '<i class="fas fa-play"></i> Retomar Apontamento';
+
+            setStatus('idle', 'Pausado');
+            addLog('Apontamento pausado', '#ffc107');
+        };
+
+        document.getElementById('manualFinishApontamentoBtn').onclick = function () {
+            openModal();
+        };
+
+        /* ── Modal ── */
+        document.getElementById('modalConfirmBtn').onclick = function () {
+            const v = parseInt(document.getElementById('quantityInput').value);
+            if (!v || v < 0) {
+                document.getElementById('quantityInput').classList.add('error');
+                document.getElementById('errorMessage').classList.add('show');
                 return;
             }
+            closeModal();
+            _doFinish(v);
+        };
 
-            running = true;
-            elapsed = 0;
-            timerInterval = setInterval(() => { elapsed++; document.getElementById('timer').textContent = formatTime(elapsed); }, 1000);
+        document.getElementById('modalCancelBtn').onclick = closeModal;
+        document.getElementById('modalCloseBtn').onclick = closeModal;
+        document.getElementById('modalOverlay').addEventListener('click', e => {
+            if (e.target === document.getElementById('modalOverlay')) closeModal();
+        });
+        document.getElementById('quantityInput').addEventListener('input', () => {
+            document.getElementById('quantityInput').classList.remove('error');
+            document.getElementById('errorMessage').classList.remove('show');
+        });
+        document.getElementById('quantityInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') document.getElementById('modalConfirmBtn').click();
+        });
 
-            document.getElementById('btnStart').disabled = true;
-            document.getElementById('btnPause').disabled = false;
-            document.getElementById('btnStop').disabled = false;
-
-            document.getElementById('statusDot').className = 'status-dot running';
-            document.getElementById('statusText').textContent = 'Apontamento em andamento';
-
-            addLog('Apontamento iniciado', 'var(--green)');
-            document.getElementById('logInitTime').textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        function openModal() {
+            document.getElementById('quantityInput').value = '';
+            document.getElementById('modalOverlay').classList.add('active');
+            setTimeout(() => document.getElementById('quantityInput').focus(), 200);
         }
 
-        function pauseApontamento() {
-            if (!paused) {
-                clearInterval(timerInterval);
-                paused = true;
-                running = false;
-                document.getElementById('btnStart').disabled = false;
-                document.getElementById('btnStart').innerHTML = '<i class="fas fa-play"></i> Retomar Apontamento';
-                document.getElementById('statusDot').className = 'status-dot';
-                document.getElementById('statusText').textContent = 'Pausado';
-                addLog('Apontamento pausado', 'var(--yellow)');
-            }
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
         }
 
-        function finishApontamento() {
-            clearInterval(timerInterval);
-            running = false;
-            paused = false;
+        function _doFinish(qty) {
+            clearInterval(timerInt);
+            running = false; wasPaused = false;
 
-            const qty = prompt('Quantidade realizada neste apontamento:');
-            if (qty === null) return;
-
-            const n = parseInt(qty) || 0;
-            const current = parseInt(document.getElementById('qtdRealizada').textContent) + n;
-            const prog = parseInt(document.getElementById('programado')?.textContent || 30);
-
-            document.getElementById('qtdRealizada').textContent = current;
-            document.getElementById('qtdRestante').textContent = Math.max(0, 30 - current);
-
-            const pct = Math.min(100, Math.round(current / 30 * 100));
+            const cur = parseInt(document.getElementById('qtdReal').textContent) + qty;
+            const prog = parseInt(document.getElementById('qtdProg').textContent);
+            document.getElementById('qtdReal').textContent = cur;
+            document.getElementById('qtdRestante').textContent = Math.max(0, prog - cur);
+            const pct = Math.min(100, Math.round(cur / prog * 100));
             document.getElementById('progressBar').style.width = pct + '%';
             document.getElementById('progressPct').textContent = pct + '%';
 
-            document.getElementById('btnStart').disabled = false;
-            document.getElementById('btnStart').innerHTML = '<i class="fas fa-play"></i> Iniciar Apontamento';
-            document.getElementById('btnPause').disabled = true;
-            document.getElementById('btnStop').disabled = true;
+            document.getElementById('startApontamentoBtn').disabled = false;
+            document.getElementById('startApontamentoBtn').innerHTML = '<i class="fas fa-play"></i> Iniciar Apontamento';
+            document.getElementById('pauseApontamentoBtn').disabled = true;
+            document.getElementById('manualFinishApontamentoBtn').disabled = true;
 
-            document.getElementById('statusDot').className = 'status-dot stopped';
-            document.getElementById('statusText').textContent = 'Apontamento finalizado';
-
-            addLog(`Finalizado · ${n} pç. produzidas · ${formatTime(elapsed)}`, 'var(--red)');
+            setStatus('stopped', 'Finalizado');
+            addLog(`Finalizado · ${qty} pç. · ${fmtTime(elapsed)}`, '#dc3545');
             elapsed = 0;
             document.getElementById('timer').textContent = '00:00:00';
+
+            // adicionar à tabela
+            addAptRow(qty);
+            showToast('success', `Apontamento finalizado com ${qty} peças.`);
         }
 
-        // ─── LOG ─────────────────────────────────
-        function addLog(msg, color) {
-            const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-            const list = document.getElementById('logList');
-            const item = document.createElement('div');
-            item.className = 'log-item';
-            item.innerHTML = `
-    <span class="log-time">${time}</span>
-    <div class="log-dot" style="background:${color}"></div>
-    <span class="log-msg">${msg}</span>
-  `;
-            list.appendChild(item);
-            list.scrollTop = list.scrollHeight;
+        /* ── Status ── */
+        function setStatus(cls, txt) {
+            document.getElementById('statusDot').className = 'status-dot ' + cls;
+            document.getElementById('statusText').textContent = txt;
         }
+
+        /* ── Log ── */
+        function addLog(msg, color) {
+            const t = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const box = document.getElementById('logBox');
+            const el = document.createElement('div');
+            el.className = 'log-item';
+            el.innerHTML = `
+    <span class="log-time">${t}</span>
+    <div class="log-dot" style="background:${color}"></div>
+    <span class="log-msg">${msg}</span>`;
+            box.appendChild(el);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        /* ── Tabela histórico ── */
+        let aptId = 1;
+        function addAptRow(qty) {
+            document.getElementById('noExistingApontamentos').style.display = 'none';
+            const tbl = document.getElementById('aptTable');
+            tbl.style.display = 'table';
+            const now = new Date().toLocaleString('pt-BR');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+    <td>${String(aptId++).padStart(3, '0')}</td>
+    <td>CASSIO D.</td>
+    <td>${now}</td>
+    <td>${now}</td>
+    <td style="font-weight:700;color:var(--success)">${qty}</td>
+    <td><span class="apt-badge done"><i class="fas fa-check-circle"></i> Concluído</span></td>`;
+            document.getElementById('existingApontamentosBody').appendChild(tr);
+        }
+
+        /* ── Toast ── */
+        function showToast(type, msg, duration = 4000) {
+            const icons = { success: 'check-circle', error: 'times-circle', info: 'info-circle', warning: 'exclamation-triangle' };
+            const el = document.createElement('div');
+            el.className = `toast ${type}`;
+            el.innerHTML = `<i class="fas fa-${icons[type] || 'info-circle'}"></i> ${msg}`;
+            document.getElementById('toast-container').appendChild(el);
+            setTimeout(() => el.remove(), duration);
+        }
+
+        /* ── POP demo ── */
+        document.getElementById('btnPop').onclick = () => {
+            showToast('info', 'Abrindo POP_LASER_CORTE_v3.pdf...');
+        };
     </script>
+
 </body>
 
 </html>

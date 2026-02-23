@@ -98,3 +98,15 @@ def get_of_full_details(of_id: str, empresa: str, codseq: str) -> dict:
         **details,
         "materiais": materials,
     }
+
+
+def get_of_details(of_id, empresa, codseq):
+
+    details = fetch_of_details(of_id, codseq)
+
+    if not details:
+        return None
+
+    materials = fetch_of_materials(of_id)
+
+    return {**details, "materiais": materials}

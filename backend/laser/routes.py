@@ -1,4 +1,4 @@
-## backend/modules/laser?routes.import pymysql
+## backend/laser/routes.py
 
 from flask import Blueprint, request, jsonify, send_file
 from core.exceptions import AppError
@@ -6,8 +6,6 @@ from laser import service
 from laser import schemas
 from .service import get_of_full_details
 from core.exceptions import NotFoundError
-from laser.service import get_of_details
-
 
 laser_bp = Blueprint("laser_bp", __name__, url_prefix="/api/laser")
 
@@ -161,24 +159,24 @@ def confirm_batch():
 
 
 # --------------------------------------------------------------------------
-# itens da OF
-# ---------------------------------------------------------------------------
-@laser_bp.route("/of/<string:of_id>/details", methods=["GET"])
+# Detalhes completos da OF
+# --------------------------------------------------------------------------
+@laser_bp.get("/of/<string:of_id>/details")
 def get_of_details_route(of_id):
 
-    empresa = request.args.get("empresa")
-    codseq = request.args.get("codseq")
-
-    if not empresa or not codseq:
-        return (
-            jsonify({"success": False, "error": "empresa e codseq são obrigatórios"}),
-            400,
-        )
-
     try:
-        data = get_of_details(of_id=of_id, empresa=empresa, codseq=codseq)
+        empresa = request.args.get("empresa")
+        codseq = request.args.get("codseq")
+
+        data = service.get_of_details(of_id, empresa, codseq)
+
+        if not data:
+            return jsonify({"success": False, "error": "OF não encontrada"}), 404
 
         return jsonify({"success": True, "data": data})
 
+    except AppError as e:
+        return _error_response(e)
+
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": f"Erro interno: {str(e)}"}), 500
