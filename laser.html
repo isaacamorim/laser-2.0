@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Extrair Dados do PDF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+</head>
+
+<body>
+    <h2>Upload do PDF</h2>
+    <input type="file" id="upload-pdf" accept="application/pdf" />
+    <h2>Debug (texto extraído)</h2>
+    <pre id="debug" style="background:#f0f0f0; padding:10px; max-height:200px; overflow:auto;"></pre>
+    <h2>Resultado</h2>
+    <pre id="output" style="background:#e0ffe0; padding:10px;"></pre>
+
+    <script>
+        document.getElementById('upload-pdf').addEventListener('change', async e => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // 1) extrai o texto bruto, juntando sem espaços extras
+            const buf = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument(new Uint8Array(buf)).promise;
+            let fullText = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                fullText += content.items.map(it => it.str).join('') + '\n';
+            }
+
+            // exibe para debug
+            document.getElementById('debug').textContent = fullText;
+
+            // 2) compacta para extrair datas/horas facilmente
+            const compact = fullText.replace(/\s+/g, '');
+
+            // Start Time
+            const st = compact.match(/StartTime(\d{4}-\d{2}-\d{2})(\d{2}:\d{2}:\d{2})/i);
+            const startTime = st ? `${st[1]} ${st[2]}` : 'Não encontrado';
+
+            // Total Time
+            const tt = compact.match(/TotalTime(\d{2}:\d{2}:\d{2}\.\d{3})/i);
+            const totalTime = tt ? tt[1] : 'Não encontrado';
+
+            // Part Name
+            const pn = compact.match(/\b(P\d{6}_\d+)\b/);
+            const partName = pn ? pn[1] : 'Não encontrado';
+
+            // 3) Part Count com regex:
+            const pcMatch = fullText.match(
+                new RegExp(partName + '[^\\n]*?(\\d+)\\s*$', 'm')
+            );
+            const partCount = pcMatch ? pcMatch[1] : 'Não encontrado';
+
+            // Exibe tudo
+            document.getElementById('output').textContent =
+                JSON.stringify({ startTime, totalTime, partName, partCount }, null, 2);
+        });
+    </script>
+</body>
+
+</html>

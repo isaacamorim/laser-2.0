@@ -1,0 +1,123 @@
+/* frontend/css/base.css*/
+
+:root {
+    --primary: #d52029;
+    --primary-dark: #b11b22;
+    --bg-main: #f5f6fa;
+    --bg-card: #ffffff;
+
+    --text-main: #2c2c2c;
+    --text-muted: #6c757d;
+
+    --success: #28a745;
+    --warning: #ffc107;
+    --danger: #dc3545;
+
+    --radius: 12px;
+    --shadow: 0 4px 12px rgba(0, 0, 0, .08);
+}
+
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* BODY */
+body {
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    background: var(--bg-main);
+    color: var(--text-main);
+}
+
+/* CONTAINER - pensando em tela vertical */
+.container {
+    max-width: 1200px;
+    /* ideal pra máquina */
+    margin: 40px auto;
+    padding: 20px;
+}
+
+/* CARD */
+.card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+}
+
+/* BOTÃO PADRÃO */
+.btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: var(--radius);
+    border: none;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    transition: .2s;
+}
+
+/* Variações */
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+.btn-success {
+    background: var(--success);
+    color: white;
+}
+
+.btn-warning {
+    background: var(--warning);
+    color: #333;
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+/* INPUT */
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--radius);
+    border: 1px solid #ccc;
+    font-size: 15px;
+}
+
+input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(213, 32, 41, .15);
+}
+
+/* TÍTULO */
+.title {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: var(--primary);
+    text-align: center;
+}
+
+/* CONTADOR */
+.badge {
+    background: var(--primary);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: .8rem;
+}

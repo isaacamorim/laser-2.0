@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laser 2.0 — Estação do Operador</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+        :root {
+            --red: #d52029;
+            --red-dark: #a81820;
+            --red-glow: rgba(213, 32, 41, .18);
+
+            --bg: #0e0f12;
+            --surface: #16181d;
+            --surface2: #1e2028;
+            --border: rgba(255, 255, 255, .07);
+            --border2: rgba(255, 255, 255, .12);
+
+            --green: #22c55e;
+            --yellow: #eab308;
+            --blue: #3b82f6;
+
+            --text: #e8eaf0;
+            --muted: #6b7280;
+            --muted2: #9ca3af;
+
+            --r: 10px;
+            --rL: 16px;
+            --shadow: 0 2px 16px rgba(0, 0, 0, .45);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ─── TOPBAR ─────────────────────── */
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--red);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+            color: white;
+        }
+
+        .brand-name {
+            font-size: .95rem;
+            font-weight: 700;
+            letter-spacing: .03em;
+        }
+
+        .brand-sub {
+            font-size: .7rem;
+            color: var(--muted);
+            font-family: 'IBM Plex Mono', monospace;
+            letter-spacing: .05em;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .topbar-clock {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: .9rem;
+            color: var(--muted2);
+        }
+
+        .operator-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            padding: 5px 12px 5px 8px;
+            border-radius: 20px;
+            font-size: .82rem;
+        }
+
+        .operator-avatar {
+            width: 24px;
+            height: 24px;
+            background: var(--red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .65rem;
+        }
+
+        /* ─── LAYOUT ─────────────────────── */
+        .page {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            grid-template-rows: auto auto 1fr;
+            gap: 16px;
+            padding: 20px 24px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* ─── OF HEADER ──────────────────── */
+        .of-header {
+            grid-column: 1/-1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--rL);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .of-header::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--red);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .of-tag {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .of-tag .label {
+            font-size: .7rem;
+            color: var(--muted);
+            font-family: 'IBM Plex Mono', monospace;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .of-tag .value {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text);
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .of-tags-row {
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .of-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--yellow);
+            box-shadow: 0 0 8px var(--yellow);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.running {
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+        }
+
+        .status-dot.stopped {
+            background: var(--muted);
+            box-shadow: none;
+            animation: none;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .4
+            }
+        }
+
+        .status-text {
+            font-size: .85rem;
+            font-weight: 600;
+            color: var(--muted2);
+        }
+
+        /* ─── MAIN PANEL ─────────────────── */
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ─── CARD ───────────────────────── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--rL);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: .82rem;
+            font-weight: 600;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--muted2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title i {
+            color: var(--red);
+            font-size: .9rem;
+        }
+
+        .card-body {
+            padding: 18px;
+        }
+
+        /* ─── MATERIAIS ──────────────────── */
+        .material-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .material-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .material-row:first-child {
+            padding-top: 0;
+        }
+
+        .mat-name {
+            font-size: .9rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .mat-spec {
+            font-size: .78rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .mat-qty {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: .82rem;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            padding: 3px 10px;
+            border-radius: 6px;
+            color: var(--muted2);
+            white-space: nowrap;
+        }
+
+        /* ─── DESENHO ────────────────────── */
+        .desenho-wrap {
+            background: var(--surface2);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .desenho-mock {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: var(--muted);
+        }
+
+        .desenho-mock svg {
+            width: 72px;
+            opacity: .3;
+        }
+
+        .desenho-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, .6);
+            border: 1px solid var(--border2);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: .7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: var(--muted2);
+        }
+
+        /* ─── TIMELINE / LOG ─────────────── */
+        .log-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .log-item {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: .82rem;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .log-item:first-child {
+            padding-top: 0;
+        }
+
+        .log-time {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--muted);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .log-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        .log-msg {
+            color: var(--muted2);
+            line-height: 1.4;
+        }
+
+        /* ─── SIDEBAR ────────────────────── */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ─── CONTROLE ───────────────────── */
+        .control-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--rL);
+            overflow: hidden;
+        }
+
+        .control-body {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px 16px;
+            border: none;
+            border-radius: var(--r);
+            font-size: .88rem;
+            font-weight: 600;
+            font-family: 'IBM Plex Sans', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all .15s;
+            letter-spacing: .02em;
+        }
+
+        .btn:disabled {
+            opacity: .35;
+            cursor: not-allowed;
+        }
+
+        .btn-start {
+            background: var(--green);
+            color: #fff;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        .btn-pause {
+            background: var(--surface2);
+            color: var(--yellow);
+            border: 1px solid rgba(234, 179, 8, .25);
+        }
+
+        .btn-pause:hover:not(:disabled) {
+            background: rgba(234, 179, 8, .1);
+        }
+
+        .btn-stop {
+            background: var(--surface2);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, .25);
+        }
+
+        .btn-stop:hover:not(:disabled) {
+            background: rgba(248, 113, 113, .1);
+        }
+
+        .btn-pop {
+            background: var(--red);
+            color: #fff;
+        }
+
+        .btn-pop:hover {
+            background: var(--red-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px var(--red-glow);
+        }
+
+        .control-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 2px 0;
+        }
+
+        /* ─── TIMER ──────────────────────── */
+        .timer-display {
+            text-align: center;
+            padding: 16px;
+            background: var(--surface2);
+            border-radius: var(--r);
+        }
+
+        .timer-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: .04em;
+            line-height: 1;
+        }
+
+        .timer-label {
+            font-size: .72rem;
+            color: var(--muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        /* ─── PROGRESS ───────────────────── */
+        .progress-wrap {
+            padding: 16px 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: .78rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            background: var(--surface2);
+            border-radius: 100px;
+            height: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--red), #ff6b6b);
+            border-radius: 100px;
+            width: 0%;
+            transition: width .4s ease;
+        }
+
+        .progress-qty {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: .82rem;
+        }
+
+        .qty-box {
+            text-align: center;
+            background: var(--surface2);
+            padding: 8px 12px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 3px;
+        }
+
+        .qty-box:first-child {
+            margin-left: 0
+        }
+
+        .qty-box:last-child {
+            margin-right: 0
+        }
+
+        .qty-num {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .qty-num.green {
+            color: var(--green)
+        }
+
+        .qty-num.blue {
+            color: var(--blue)
+        }
+
+        .qty-lbl {
+            font-size: .68rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-top: 2px;
+        }
+
+        /* ─── APONTAMENTOS TABLE ─────────── */
+        .apt-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .8rem;
+        }
+
+        .apt-table th {
+            padding: 8px 10px;
+            text-align: left;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .apt-table td {
+            padding: 9px 10px;
+            border-bottom: 1px solid var(--border);
+            color: var(--muted2);
+        }
+
+        .apt-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .apt-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: .72rem;
+            font-weight: 600;
+        }
+
+        .apt-badge.done {
+            background: rgba(34, 197, 94, .12);
+            color: #4ade80
+        }
+
+        .apt-badge.running {
+            background: rgba(59, 130, 246, .12);
+            color: #60a5fa
+        }
+
+        .apt-badge.paused {
+            background: rgba(234, 179, 8, .12);
+            color: #fbbf24
+        }
+
+        /* ─── EMPTY ──────────────────────── */
+        .empty-state {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--muted);
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+            opacity: .3;
+        }
+
+        .empty-state p {
+            font-size: .82rem;
+            line-height: 1.5;
+        }
+
+        /* ─── SCROLLBAR ──────────────────── */
+        ::-webkit-scrollbar {
+            width: 5px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--surface2);
+            border-radius: 10px
+        }
+
+        /* ─── BACK BTN ───────────────────── */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .8rem;
+            color: var(--muted);
+            text-decoration: none;
+            padding: 5px 0;
+            transition: .15s;
+        }
+
+        .back-link:hover {
+            color: var(--text)
+        }
+
+        /* ─── ANIMATIONS ─────────────────── */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .card,
+        .of-header,
+        .control-card {
+            animation: fadeIn .35s ease both;
+        }
+
+        .page>*:nth-child(2) {
+            animation-delay: .05s
+        }
+
+        .page>*:nth-child(3) {
+            animation-delay: .1s
+        }
+
+        .page>*:nth-child(4) {
+            animation-delay: .15s
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ════════ TOPBAR ════════ -->
+    <div class="topbar">
+        <div class="topbar-brand">
+            <div class="brand-icon"><i class="fas fa-crosshairs"></i></div>
+            <div>
+                <div class="brand-name">Apontamento Laser</div>
+                <div class="brand-sub">ESTAÇÃO DO OPERADOR v2.0</div>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <div class="topbar-clock" id="clock">00:00:00</div>
+            <div class="operator-chip">
+                <div class="operator-avatar"><i class="fas fa-user" style="font-size:.55rem"></i></div>
+                <span>OP 0011 — CASSIO D.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════ PAGE ════════ -->
+    <div class="page">
+
+        <!-- ─── OF HEADER ─── -->
+        <div class="of-header">
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                <a href="#" class="back-link"><i class="fas fa-chevron-left"></i> Sequenciamento</a>
+                <div style="width:1px;height:24px;background:var(--border)"></div>
+                <div class="of-tags-row">
+                    <div class="of-tag">
+                        <span class="label">OF</span>
+                        <span class="value">58444</span>
+                    </div>
+                    <div class="of-tag">
+                        <span class="label">Operação</span>
+                        <span class="value">OP-39</span>
+                    </div>
+                    <div class="of-tag">
+                        <span class="label">Máquina</span>
+                        <span class="value">LASER-01</span>
+                    </div>
+                    <div class="of-tag">
+                        <span class="label">Tarefa</span>
+                        <span class="value" style="font-family:'IBM Plex Sans',sans-serif;font-size:.95rem">Corte de
+                            Chapa</span>
+                    </div>
+                    <div class="of-tag">
+                        <span class="label">Produto</span>
+                        <span class="value"
+                            style="font-family:'IBM Plex Sans',sans-serif;font-size:.95rem">P003107</span>
+                    </div>
+                </div>
+            </div>
+            <div class="of-status">
+                <div class="status-dot" id="statusDot"></div>
+                <span class="status-text" id="statusText">Pronto para iniciar</span>
+            </div>
+        </div>
+
+        <!-- ─── MAIN PANEL ─── -->
+        <div class="main-panel">
+
+            <!-- Descrição -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-tag"></i> Descrição da Peça</span>
+                </div>
+                <div class="card-body">
+                    <div style="font-size:1.05rem;font-weight:600;margin-bottom:4px">FERRO CHATO BASE DO MANCAL DO CORPO
+                    </div>
+                    <div style="font-size:.85rem;color:var(--muted)">Destino: SP/MG &nbsp;·&nbsp; Sequência: 39
+                        &nbsp;·&nbsp; Empresa: 1</div>
+                </div>
+            </div>
+
+            <!-- Desenho -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-drafting-compass"></i> Desenho da Peça</span>
+                    <div class="apt-badge done" style="font-size:.7rem">P003107.STEP</div>
+                </div>
+                <div class="card-body" style="padding:12px">
+                    <div class="desenho-wrap">
+                        <div class="desenho-mock">
+                            <!-- SVG placeholder de peça -->
+                            <svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="20" y="40" width="160" height="40" rx="4" stroke="#e8eaf0" stroke-width="2" />
+                                <rect x="40" y="30" width="30" height="20" rx="2" stroke="#e8eaf0" stroke-width="1.5" />
+                                <rect x="130" y="30" width="30" height="20" rx="2" stroke="#e8eaf0"
+                                    stroke-width="1.5" />
+                                <circle cx="55" cy="60" r="6" stroke="#e8eaf0" stroke-width="1.5" />
+                                <circle cx="145" cy="60" r="6" stroke="#e8eaf0" stroke-width="1.5" />
+                                <line x1="20" y1="90" x2="180" y2="90" stroke="#e8eaf0" stroke-width="1"
+                                    stroke-dasharray="4 3" />
+                                <line x1="100" y1="40" x2="100" y2="80" stroke="#d52029" stroke-width="1"
+                                    stroke-dasharray="3 2" />
+                                <!-- cotagem -->
+                                <line x1="20" y1="100" x2="180" y2="100" stroke="#6b7280" stroke-width="1" />
+                                <line x1="20" y1="96" x2="20" y2="104" stroke="#6b7280" stroke-width="1" />
+                                <line x1="180" y1="96" x2="180" y2="104" stroke="#6b7280" stroke-width="1" />
+                            </svg>
+                            <div style="font-size:.78rem">Arquivo .STEP disponível para download</div>
+                        </div>
+                        <div class="desenho-badge">PREVIEW</div>
+                    </div>
+                    <div style="margin-top:10px;display:flex;gap:8px">
+                        <button class="btn btn-pop" style="flex:1;padding:10px">
+                            <i class="fas fa-download"></i> Baixar .STEP
+                        </button>
+                        <button class="btn"
+                            style="flex:1;padding:10px;background:var(--surface2);color:var(--muted2);border:1px solid var(--border2)">
+                            <i class="fas fa-expand-alt"></i> Ampliar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Materiais -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-boxes"></i> Materiais da OF</span>
+                    <span style="font-size:.75rem;color:var(--muted)">4 itens</span>
+                </div>
+                <div class="card-body" style="padding:14px 18px">
+                    <div class="material-row">
+                        <div>
+                            <div class="mat-name">Ferro Chato A36</div>
+                            <div class="mat-spec">Bitola 3/16" · Comprimento variável</div>
+                        </div>
+                        <div class="mat-qty">Qtd: 30</div>
+                    </div>
+                    <div class="material-row">
+                        <div>
+                            <div class="mat-name">Gás Nitrogênio</div>
+                            <div class="mat-spec">Alta pureza · Cilindro 50L</div>
+                        </div>
+                        <div class="mat-qty">1 cil.</div>
+                    </div>
+                    <div class="material-row">
+                        <div>
+                            <div class="mat-name">Insumo Lubrificante</div>
+                            <div class="mat-spec">EP-220 · Aplicação em cabeçote</div>
+                        </div>
+                        <div class="mat-qty">Qtd: 1</div>
+                    </div>
+                    <div class="material-row">
+                        <div>
+                            <div class="mat-name">Bico de Corte</div>
+                            <div class="mat-spec">Ø1.5mm · Série Standard</div>
+                        </div>
+                        <div class="mat-qty">Qtd: 1</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Histórico de apontamentos -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-history"></i> Apontamentos desta OF</span>
+                </div>
+                <div class="card-body" style="padding:0">
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Nenhum apontamento realizado ainda.<br>Inicie o apontamento para registrar a produção.</p>
+                    </div>
+                    <!--
+        Quando tiver dados:
+        <table class="apt-table">
+          <thead>
+            <tr>
+              <th>#</th><th>Operador</th><th>Início</th><th>Fim</th><th>Qtd</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>001</td>
+              <td>CASSIO D.</td>
+              <td>08:12:04</td>
+              <td>10:55:21</td>
+              <td>15</td>
+              <td><span class="apt-badge done">✓ Concluído</span></td>
+            </tr>
+          </tbody>
+        </table>
+        -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ─── SIDEBAR ─── -->
+        <div class="sidebar">
+
+            <!-- POP -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-file-alt"></i> Procedimento (POP)</span>
+                </div>
+                <div class="card-body">
+                    <div style="font-size:.82rem;color:var(--muted);margin-bottom:12px;line-height:1.5">
+                        Consulte o procedimento padrão antes de iniciar o processo de corte.
+                    </div>
+                    <button class="btn btn-pop" onclick="alert('Abrindo POP_LASER_CORTE.pdf...')">
+                        <i class="fas fa-external-link-alt"></i> Abrir POP da Operação
+                    </button>
+                    <div style="margin-top:8px;font-size:.72rem;color:var(--muted);text-align:center">
+                        POP_LASER_CORTE_v3.pdf
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controle -->
+            <div class="control-card">
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-sliders-h"></i> Controle de Produção</span>
+                </div>
+
+                <!-- Timer -->
+                <div style="padding:16px 18px;border-bottom:1px solid var(--border)">
+                    <div class="timer-display">
+                        <div class="timer-value" id="timer">00:00:00</div>
+                        <div class="timer-label">Tempo de apontamento</div>
+                    </div>
+                </div>
+
+                <!-- Qtd -->
+                <div class="progress-wrap">
+                    <div class="progress-header">
+                        <span>Progresso da OF</span>
+                        <span id="progressPct">0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progressBar"></div>
+                    </div>
+                    <div class="progress-qty">
+                        <div class="qty-box">
+                            <div class="qty-num green" id="qtdRealizada">0</div>
+                            <div class="qty-lbl">Realizado</div>
+                        </div>
+                        <div class="qty-box">
+                            <div class="qty-num blue">30</div>
+                            <div class="qty-lbl">Programado</div>
+                        </div>
+                        <div class="qty-box">
+                            <div class="qty-num" id="qtdRestante" style="color:var(--muted2)">30</div>
+                            <div class="qty-lbl">Restante</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-body">
+                    <button class="btn btn-start" id="btnStart" onclick="startApontamento()">
+                        <i class="fas fa-play"></i> Iniciar Apontamento
+                    </button>
+                    <button class="btn btn-pause" id="btnPause" disabled onclick="pauseApontamento()">
+                        <i class="fas fa-pause"></i> Pausar
+                    </button>
+                    <div class="control-divider"></div>
+                    <button class="btn btn-stop" id="btnStop" disabled onclick="finishApontamento()">
+                        <i class="fas fa-stop"></i> Finalizar Apontamento
+                    </button>
+                </div>
+            </div>
+
+            <!-- Log -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-terminal"></i> Log de Atividade</span>
+                </div>
+                <div class="card-body" style="padding:14px 18px">
+                    <div class="log-list" id="logList">
+                        <div class="log-item">
+                            <span class="log-time" id="logInitTime">--:--</span>
+                            <div class="log-dot" style="background:var(--blue)"></div>
+                            <span class="log-msg">OF carregada e pronta para apontamento</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // ─── CLOCK ───────────────────────────────
+        function updateClock() {
+            const n = new Date();
+            document.getElementById('clock').textContent =
+                n.toLocaleTimeString('pt-BR');
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // ─── TIMER ───────────────────────────────
+        let timerInterval = null;
+        let elapsed = 0;
+        let running = false;
+        let paused = false;
+
+        function formatTime(s) {
+            const h = String(Math.floor(s / 3600)).padStart(2, '0');
+            const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+            const sec = String(s % 60).padStart(2, '0');
+            return `${h}:${m}:${sec}`;
+        }
+
+        function startApontamento() {
+            if (paused) {
+                // Retomar
+                running = true;
+                paused = false;
+                timerInterval = setInterval(() => { elapsed++; document.getElementById('timer').textContent = formatTime(elapsed); }, 1000);
+                document.getElementById('btnStart').disabled = true;
+                document.getElementById('btnPause').disabled = false;
+                document.getElementById('btnStop').disabled = false;
+                document.getElementById('statusDot').className = 'status-dot running';
+                document.getElementById('statusText').textContent = 'Apontamento em andamento';
+                addLog('Apontamento retomado', 'var(--green)');
+                return;
+            }
+
+            running = true;
+            elapsed = 0;
+            timerInterval = setInterval(() => { elapsed++; document.getElementById('timer').textContent = formatTime(elapsed); }, 1000);
+
+            document.getElementById('btnStart').disabled = true;
+            document.getElementById('btnPause').disabled = false;
+            document.getElementById('btnStop').disabled = false;
+
+            document.getElementById('statusDot').className = 'status-dot running';
+            document.getElementById('statusText').textContent = 'Apontamento em andamento';
+
+            addLog('Apontamento iniciado', 'var(--green)');
+            document.getElementById('logInitTime').textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function pauseApontamento() {
+            if (!paused) {
+                clearInterval(timerInterval);
+                paused = true;
+                running = false;
+                document.getElementById('btnStart').disabled = false;
+                document.getElementById('btnStart').innerHTML = '<i class="fas fa-play"></i> Retomar Apontamento';
+                document.getElementById('statusDot').className = 'status-dot';
+                document.getElementById('statusText').textContent = 'Pausado';
+                addLog('Apontamento pausado', 'var(--yellow)');
+            }
+        }
+
+        function finishApontamento() {
+            clearInterval(timerInterval);
+            running = false;
+            paused = false;
+
+            const qty = prompt('Quantidade realizada neste apontamento:');
+            if (qty === null) return;
+
+            const n = parseInt(qty) || 0;
+            const current = parseInt(document.getElementById('qtdRealizada').textContent) + n;
+            const prog = parseInt(document.getElementById('programado')?.textContent || 30);
+
+            document.getElementById('qtdRealizada').textContent = current;
+            document.getElementById('qtdRestante').textContent = Math.max(0, 30 - current);
+
+            const pct = Math.min(100, Math.round(current / 30 * 100));
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressPct').textContent = pct + '%';
+
+            document.getElementById('btnStart').disabled = false;
+            document.getElementById('btnStart').innerHTML = '<i class="fas fa-play"></i> Iniciar Apontamento';
+            document.getElementById('btnPause').disabled = true;
+            document.getElementById('btnStop').disabled = true;
+
+            document.getElementById('statusDot').className = 'status-dot stopped';
+            document.getElementById('statusText').textContent = 'Apontamento finalizado';
+
+            addLog(`Finalizado · ${n} pç. produzidas · ${formatTime(elapsed)}`, 'var(--red)');
+            elapsed = 0;
+            document.getElementById('timer').textContent = '00:00:00';
+        }
+
+        // ─── LOG ─────────────────────────────────
+        function addLog(msg, color) {
+            const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const list = document.getElementById('logList');
+            const item = document.createElement('div');
+            item.className = 'log-item';
+            item.innerHTML = `
+    <span class="log-time">${time}</span>
+    <div class="log-dot" style="background:${color}"></div>
+    <span class="log-msg">${msg}</span>
+  `;
+            list.appendChild(item);
+            list.scrollTop = list.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>
