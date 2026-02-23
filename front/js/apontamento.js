@@ -11,6 +11,7 @@ import {
     apiFinishApontamento,
     fetchApontamentos,
     fetchOfDetails,
+    buildStepDownloadUrl,
 } from "./api.js";
 import {
     showToast,
@@ -22,6 +23,7 @@ import {
     askConfirmation,
 } from "./ui.js";
 import { loadSequencing } from "./dashboard.js";
+import { startTimer, pauseTimer, resetTimer } from "./timer.js";
 
 // ── Abertura da view ───────────────────────────────────────────
 export async function openApontamento(job) {
@@ -29,8 +31,10 @@ export async function openApontamento(job) {
 
     showView("apontamento");
 
-    try {
+    // Reseta timer ao entrar na view
+    resetTimer();
 
+    try {
         const res = await fetchOfDetails(
             job.SOC_CODIOF,
             job.SOC_EMPRESA,
@@ -41,23 +45,55 @@ export async function openApontamento(job) {
             throw new Error(res.error);
         }
 
-        const data = res.data;
+        _fillNewLayout(job, res.data);
 
-        _fillNewLayout(job, data);
+        // Botão de download do .STEP
+        const btnStep = document.getElementById("btnDownloadStep");
+        if (btnStep) {
+            if (job.JPC_DESENHO_ENG) {
+                btnStep.disabled = false;
+                btnStep.onclick = () => {
+                    window.location = buildStepDownloadUrl(job.JPC_DESENHO_ENG);
+                };
+            } else {
+                btnStep.disabled = true;
+                btnStep.onclick = null;
+            }
+        }
+
+        // POP
+        const btnPop = document.getElementById("btnPop");
+        const popName = document.getElementById("popName");
+        if (btnPop) {
+            if (res.data.pop_url) {
+                btnPop.disabled = false;
+                btnPop.onclick = () => window.open(res.data.pop_url, "_blank");
+                if (popName) popName.textContent = res.data.pop_nome || res.data.pop_url;
+            } else {
+                btnPop.disabled = true;
+                btnPop.onclick = null;
+                if (popName) popName.textContent = "POP não cadastrado";
+            }
+        }
 
     } catch (e) {
         showToast("error", "Erro ao carregar detalhes da OF: " + e.message);
         return;
     }
 
+    // Verifica se existe apontamento aberto para esta OF
     const active = await _checkActiveApontamento(job.SOC_CODIOF);
 
     if (active) {
         state.apontamentoId = active.SOF_APONTAOFID;
         state.apontamentoState = "started";
+        startTimer(); // Retoma timer se havia apontamento em aberto
     } else {
         resetApontamento();
     }
+
+    // Carrega histórico de apontamentos
+    await _loadExistingApontamentos(job.SOC_CODIOF);
 
     syncControlButtons(state.apontamentoState, state.apontamentoId);
     updateApontamentoStatus(state.apontamentoState);
@@ -71,15 +107,19 @@ export function initApontamento() {
     document.getElementById("manualFinishApontamentoBtn").addEventListener("click", _handleFinish);
     document.getElementById("finishApontamentoBtn").addEventListener("click", _handleBack);
 
-    // Modal
+    // Modal — Enter confirma
     const qInput = document.getElementById("quantityInput");
     qInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") import("./ui.js").then(m => m.confirmQuantity());
     });
+
+    // Modal — limpa erro ao digitar
     qInput.addEventListener("input", () => {
         qInput.classList.remove("error");
         document.getElementById("errorMessage").classList.remove("show");
     });
+
+    // Modal — fecha ao clicar fora
     document.getElementById("modalOverlay").addEventListener("click", (e) => {
         if (e.target === document.getElementById("modalOverlay")) {
             import("./ui.js").then(m => m.closeModal());
@@ -98,6 +138,7 @@ async function _handleStart() {
     btn.disabled = true;
 
     try {
+
         const result = await apiStartApontamento(
             state.selectedOf.SOC_CODIOF,
             state.selectedOf.SOC_EMPRESA,
@@ -105,16 +146,35 @@ async function _handleStart() {
             state.selectedOf.SOC_CODSEQ ?? 1
         );
 
-        if (!result.success || !result.apontamento_id) {
-            throw new Error(result.error || "Falha ao iniciar apontamento.");
+        if (!result.success) {
+
+            // Preserva código do backend
+            const err = new Error(result.message || "Falha ao iniciar");
+            err.code = result.code;
+
+            throw err;
+        }
+
+        if (!result.apontamento_id) {
+            throw new Error("ID do apontamento não retornado.");
         }
 
         state.apontamentoId = result.apontamento_id;
         state.apontamentoState = "started";
+
+        startTimer();
+
         showToast("success", `Apontamento ${state.apontamentoId} iniciado.`);
         _refresh();
+
     } catch (e) {
-        showToast("error", e.message);
+
+        if (e.code === "APONTAMENTO_ABERTO") {
+            showToast("warning", e.message, 8000);
+        } else {
+            showToast("error", e.message || "Erro inesperado");
+        }
+
         btn.disabled = false;
     }
 }
@@ -134,11 +194,12 @@ async function _handlePause() {
         if (!result.success)
             throw new Error(result.error || "Falha ao pausar.");
 
+        pauseTimer();
+
         state.apontamentoState = "idle";
         state.apontamentoId = null;
 
         showToast("success", "Apontamento pausado.");
-
         _refresh();
 
     } catch (e) {
@@ -161,14 +222,23 @@ async function _handleFinish() {
 
     try {
         const result = await apiFinishApontamento(state.apontamentoId, qtd);
-        if (!result.success) throw new Error(result.error || "Falha ao finalizar.");
+
+        if (!result.success)
+            throw new Error(result.error || "Falha ao finalizar.");
+
+        pauseTimer();
+        resetTimer();
 
         showToast("success", `Apontamento ${state.apontamentoId} finalizado com quantidade ${qtd}.`);
+
         state.apontamentoState = "idle";
         state.apontamentoId = null;
+
         _refresh();
+
     } catch (e) {
         showToast("error", e.message);
+        // Só reabilita o botão se o apontamento ainda estiver ativo
         if (state.apontamentoState === "started") btn.disabled = false;
     }
 }
@@ -180,8 +250,12 @@ async function _handleBack() {
         if (!ok) return;
     }
 
+    pauseTimer();
+    resetTimer();
+
     state.selectedOf = null;
     resetApontamento();
+
     await loadSequencing();
     showView("dashboard");
 }
@@ -190,7 +264,9 @@ async function _handleBack() {
 function _refresh() {
     syncControlButtons(state.apontamentoState, state.apontamentoId);
     updateApontamentoStatus(state.apontamentoState);
-    if (state.selectedOf) _loadExistingApontamentos(state.selectedOf.SOC_CODIOF);
+    if (state.selectedOf) {
+        _loadExistingApontamentos(state.selectedOf.SOC_CODIOF);
+    }
 }
 
 async function _checkActiveApontamento(ofId) {
@@ -200,7 +276,9 @@ async function _checkActiveApontamento(ofId) {
             return data.apontamentos.find(ap => !ap.SOF_DTAFIM) ?? null;
         }
         return null;
-    } catch { return null; }
+    } catch {
+        return null;
+    }
 }
 
 async function _loadExistingApontamentos(ofId) {
@@ -216,19 +294,7 @@ async function _loadExistingApontamentos(ofId) {
     }
 }
 
-function _updateOfDisplay() {
-    const of = state.selectedOf;
-    document.getElementById("ofNumber").textContent = of.SOC_CODIOF || "-";
-    document.getElementById("empresaNumber").textContent = of.SOC_EMPRESA || "-";
-    document.getElementById("productCode").textContent = of.JRO_PROERP || "-";
-    const desc = of.JRO_DESCRI || "-";
-    const descEl = document.getElementById("productDescription");
-    descEl.textContent = desc.length > 40 ? desc.substring(0, 40) + "..." : desc;
-    descEl.title = desc;
-}
-
-// ── Renderizações de tabela ────────────────────────────────────
-
+// ── Renderização da tabela de apontamentos existentes ──────────
 function renderExistingTable(apontamentos) {
     const tbody = document.getElementById("existingApontamentosBody");
     const table = document.getElementById("existingApontamentosTable");
@@ -249,106 +315,108 @@ function renderExistingTable(apontamentos) {
         const row = tbody.insertRow();
         row.style.backgroundColor = index % 2 === 0 ? "#fff" : "#fafafa";
 
-        const status = ap.SOF_DTAFIM ? "Finalizado" : "Em andamento";
-        const color = ap.SOF_DTAFIM ? "#28a745" : "#ffc107";
-        const bgColor = ap.SOF_DTAFIM ? "#e8f5e8" : "#fff8e1";
-        const icon = ap.SOF_DTAFIM ? "fa-check-circle" : "fa-clock";
+        const finalizado = !!ap.SOF_DTAFIM;
+        const statusLabel = finalizado ? "Finalizado" : "Em andamento";
+        const statusColor = finalizado ? "#28a745" : "#ffc107";
+        const statusBg = finalizado ? "#e8f5e8" : "#fff8e1";
+        const statusIcon = finalizado ? "fa-check-circle" : "fa-clock";
 
-        const cells = [
-            ap.SOF_APONTAOFID || "-",
-            ap.SOF_OPERAD || "-",
-            ap.SOF_DTINIC || "-",
-            ap.SOF_DTAFIM || "-",
-        ];
+        const cellStyle = "padding:12px;border-bottom:1px solid #f0f0f0";
 
-        cells.forEach(txt => {
-            const td = row.insertCell();
-            td.style.padding = "14px 12px";
-            td.style.borderBottom = "1px solid #f0f0f0";
-            td.textContent = txt;
-        });
+        // ID
+        _insertCell(row, ap.SOF_APONTAOFID || "-", `${cellStyle};text-align:center`);
+        // Operador
+        _insertCell(row, ap.SOF_OPERAD || "-", cellStyle);
+        // Início
+        _insertCell(row, ap.SOF_DTINIC || "-", cellStyle);
+        // Fim
+        _insertCell(row, ap.SOF_DTAFIM || "-", cellStyle);
+        // Quantidade
+        _insertCell(row, ap.SOF_QNTBOA || "0", `${cellStyle};text-align:center;font-weight:600;color:#2e7d32`);
 
-        // Qtd
-        const qtdTd = row.insertCell();
-        qtdTd.style.cssText = "padding:14px 12px;text-align:center;font-weight:600;color:#2e7d32;border-bottom:1px solid #f0f0f0";
-        qtdTd.textContent = ap.SOF_QNTBOA || "0";
-
-        // Status badge
+        // Status
         const statusTd = row.insertCell();
-        statusTd.style.cssText = "padding:14px 12px;text-align:center;border-bottom:1px solid #f0f0f0";
+        statusTd.style.cssText = `${cellStyle};text-align:center`;
         statusTd.innerHTML = `
-      <span style="background:${bgColor};color:${color};padding:6px 12px;border-radius:20px;
-                   font-size:0.8rem;border:1px solid ${color}20;display:inline-flex;align-items:center;gap:6px">
-        <i class="fas ${icon}"></i> ${status}
-      </span>`;
+            <span style="background:${statusBg};color:${statusColor};padding:4px 10px;border-radius:20px;
+                         font-size:.78rem;border:1px solid ${statusColor}30;
+                         display:inline-flex;align-items:center;gap:5px;font-weight:600">
+                <i class="fas ${statusIcon}"></i> ${statusLabel}
+            </span>`;
 
         // Erros
-        const erroTd = row.insertCell();
-        erroTd.style.cssText = "padding:14px 12px;text-align:center;border-bottom:1px solid #f0f0f0";
-        erroTd.textContent = ap.SOF_ERROINTEGRA || "✅";
+        _insertCell(row, ap.SOF_ERROINTEGRA || "✅", `${cellStyle};text-align:center`);
     });
 }
 
+function _insertCell(row, text, cssText) {
+    const td = row.insertCell();
+    td.style.cssText = cssText;
+    td.textContent = text;
+}
+
+// ── Preenche o layout v2 com dados da OF ───────────────────────
 function _fillNewLayout(job, data) {
+    const set = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val ?? "-";
+    };
 
-    document.getElementById("ofValue").textContent = job.SOC_CODIOF;
-    document.getElementById("opValue").textContent = data.operacao || "-";
-    document.getElementById("maqValue").textContent = data.maquina || "-";
-    document.getElementById("prodValue").textContent = job.JRO_PROERP || "-";
-    document.getElementById("descValue").textContent = job.JRO_DESCRI || "-";
+    set("ofValue", job.SOC_CODIOF);
+    set("opValue", data.operacao);
+    set("maqValue", data.maquina);
+    set("prodValue", job.JRO_PROERP);
+    set("descValue", job.JRO_DESCRI);
 
+    // Materiais
     const box = document.getElementById("materialsBox");
-    box.innerHTML = "";
+    if (box) {
+        box.innerHTML = "";
 
-    if (!data.materiais.length) {
-        box.innerHTML = "<div class='empty-state'>Sem materiais</div>";
+        if (!data.materiais?.length) {
+            box.innerHTML = `
+                <div class="empty-state-v2">
+                    <i class="fas fa-boxes"></i>
+                    Sem materiais cadastrados
+                </div>`;
+        } else {
+            data.materiais.forEach(m => {
+                const row = document.createElement("div");
+                row.className = "material-row";
+                row.innerHTML = `
+                    <div>
+                        <div class="mat-name">${m.codigo || "-"}</div>
+                        <div class="mat-spec">${m.descricao || ""}</div>
+                    </div>
+                    <div class="mat-qty">${m.estoque ?? "-"}</div>`;
+                box.appendChild(row);
+            });
+        }
     }
 
-    data.materiais.forEach(m => {
-        const row = document.createElement("div");
-        row.className = "material-row";
-
-        row.innerHTML = `
-      <div>
-        <div class="mat-name">${m.codigo}</div>
-        <div class="mat-spec">${m.descricao || ''}</div>
-      </div>
-      <div class="mat-qty">${m.estoque}</div>
-    `;
-
-        box.appendChild(row);
-    });
-
+    // Progresso
     const prog = job.QUANTIDADE_PROGRAMADA || 0;
     const real = job.QUANTIDADE_REALIZADA || 0;
+    const pct = prog > 0 ? Math.min(100, Math.round((real / prog) * 100)) : 0;
 
-    document.getElementById("qtdReal").textContent = real;
-    document.getElementById("qtdProg").textContent = prog;
-    document.getElementById("qtdRestante").textContent = Math.max(0, prog - real);
+    set("qtdReal", real);
+    set("qtdProg", prog);
+    set("qtdRestante", Math.max(0, prog - real));
+    set("progressPct", pct + "%");
 
-    const pct = prog > 0 ? Math.round((real / prog) * 100) : 0;
+    const bar = document.getElementById("progressBar");
+    if (bar) bar.style.width = pct + "%";
 
-    document.getElementById("progressBar").style.width = pct + "%";
-    document.getElementById("progressPct").textContent = pct + "%";
-}
+    // Preview do desenho
+    const img = document.getElementById("drawingImg");
+    const empty = document.getElementById("drawingEmpty");
 
-function renderOfDetails(data) {
-
-    document.getElementById("maquina").textContent = data.maquina;
-    document.getElementById("np").textContent = data.np;
-
-    const matList = document.getElementById("materiais");
-    matList.innerHTML = "";
-
-    data.materiais.forEach(m => {
-        matList.innerHTML += `
-      <div class="material-row">
-        <div>
-          <div class="mat-name">${m.descricao}</div>
-          <div class="mat-spec">${m.codigo}</div>
-        </div>
-        <div class="mat-qty">${m.estoque}</div>
-      </div>
-    `;
-    });
+    if (img && data.desenho_url) {
+        img.src = data.desenho_url;
+        img.style.display = "block";
+        if (empty) empty.style.display = "none";
+    } else {
+        if (img) img.style.display = "none";
+        if (empty) empty.style.display = "flex";
+    }
 }

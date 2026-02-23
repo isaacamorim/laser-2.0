@@ -32,11 +32,21 @@ def submit_apontamento(data: dict) -> None:
 
 
 def start_apontamento(data: dict) -> int:
+
     open_ap = repository.fetch_open_apontamento(
         data["operator_code"], data["empresa_id"]
     )
+
     if open_ap:
-        raise ConflictError("Já existe um apontamento em andamento para este operador.")
+
+        # Já está na mesma OF → reutiliza
+        if open_ap["SOF_CODIOF"] == data["of_id"]:
+            return open_ap["SOF_APONTAOFID"]
+
+        # Está em outra OF → bloqueia
+        raise ConflictError(
+            f"Operador já possui apontamento aberto na OF {open_ap['SOF_CODIOF']}."
+        )
 
     return repository.insert_apontamento_start(
         of_id=data["of_id"],

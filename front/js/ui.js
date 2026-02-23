@@ -135,3 +135,25 @@ export function showView(name) {
 export function askConfirmation(message) {
     return new Promise((resolve) => resolve(window.confirm(message)));
 }
+// CLOCK (topbar, independente do ui.js)
+(function tick() {
+    const el = document.getElementById('topbarClock');
+    if (el) el.textContent = new Date().toLocaleTimeString('pt-BR');
+    setTimeout(tick, 1000);
+})();
+
+// Atualiza chip do operador quando o nome for definido
+// (auth.js define operatorCodeLabel / operatorNameLabel — aqui só espelhamos)
+const _origObserver = new MutationObserver(() => {
+    const code = document.getElementById('operatorCodeLabel')?.textContent;
+    const name = document.getElementById('operatorNameLabel')?.textContent;
+    const el = document.getElementById('topbarOperator');
+    if (el && code && code !== '---') {
+        el.textContent = `OP ${code}${name && name !== '---' ? ' — ' + name : ''}`;
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const codeEl = document.getElementById('operatorCodeLabel');
+    if (codeEl) _origObserver.observe(codeEl.parentElement, { childList: true, subtree: true, characterData: true });
+});
